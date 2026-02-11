@@ -6,9 +6,9 @@
 
 FlatNas 是一个轻量级、高度可定制的个人导航页与仪表盘系统。它基于 Vue 3 与 Go(Gin) 构建，旨在为 NAS 用户、极客和开发者提供一个优雅的浏览器起始页。
 交流QQ群:613835409
-![debian\1.png](public\1.png)
-![debian\7.png](public\7.png)
-![debian\9.png](public\9.png)
+![debian/1.png](public/1.png)
+![debian/7.png](public/7.png)
+![debian/9.png](public/9.png)
 
 ### ✨ 功能概览
 
@@ -30,7 +30,7 @@ FlatNas 是一个轻量级、高度可定制的个人导航页与仪表盘系统
 ### 🧩 丰富的小组件
 
 FlatNas 内置了多种实用的小组件，满足日常需求：
-![tools.png](public\tools.png)
+![tools.png](public/tools.png)
 
 - **文件传输助手**: 强大的跨设备传输工具。支持发送文本、文件与图片；支持断点续传、大文件上传；提供专属**图片**视图，自动归类并预览所有图片文件。
 - **书签组件**: 快速访问常用网站，支持自定义图标。首次启动时会自动填充常用的 10 个网站（如 GitHub, Bilibili 等）。
@@ -46,12 +46,12 @@ FlatNas 内置了多种实用的小组件，满足日常需求：
 - **iframe组件**: 支持嵌入外部网页，如视频、地图等。
 - **自定义组件**: 支持添加自定义 HTML 组件，实现更多功能。
 - **道理鱼组件**: 支持添加道理鱼音乐组件。
-  ![高德天气.png](public\高德天气.png)
+  ![高德天气.png](public/高德天气.png)
 
 ### 🎨 个性化定制
 
 FlatNas 提供了丰富的自定义选项，并自建了60000个图标的图标库，满足不同用户的需求：
-![icon.png](public\icon.png)
+![icon.png](public/icon.png)
 
 - **自定义组件**: 支持添加自定义 HTML 组件，实现更多功能。
 - **自定义CSS**: 支持添加自定义 CSS 样式，实现更多定制化效果。
@@ -66,7 +66,7 @@ FlatNas 提供了丰富的自定义选项，并自建了60000个图标的图标�
   - 本地存储配置 (`server/data/data.json`)，数据完全掌握在自己手中。
   - 简单的密码访问保护（默认密码：`admin`），保护隐私配置。
 - **更新提醒**: 内置版本检测功能，自动检查 GitHub 最新 Release 版本，并在设置面板提示 Docker 更新。
-  ![自定义脚本.png](public\自定义脚本.png)
+  ![自定义脚本.png](public/自定义脚本.png)
 
 ## 🌐 代理配置
 

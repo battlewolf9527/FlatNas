@@ -6,6 +6,9 @@
 
 FlatNas 是一个轻量级、高度可定制的个人导航页与仪表盘系统。它基于 Vue 3 与 Go(Gin) 构建，旨在为 NAS 用户、极客和开发者提供一个优雅的浏览器起始页。
 交流QQ群:613835409
+![debian\1.png](debian\1.png)
+![debian\7.png](debian\7.png)
+![debian\9.png](debian\9.png)
 
 ### ✨ 功能概览
 
@@ -14,6 +17,7 @@ FlatNas 是一个轻量级、高度可定制的个人导航页与仪表盘系统
 - **内外网智能切换**: 自动识别网络环境并路由到最佳地址。
 - **本地数据可控**: 配置与数据存储在本地目录，迁移与备份更方便。
 - **可视化组件生态**: 内置多种组件，支持自定义 CSS/JS 深度扩展。
+- **资源内存占用极低**: NAS端占用100MB内存，访问端真实内存占用不到80兆。
 
 ### 🖥️ 仪表盘与布局
 
@@ -83,7 +87,7 @@ FlatNas 后端集成了智能网络环境识别功能，能够根据用户的访
 
 ## 📦 安装与部署
 
-### 1. Debian 一键部署
+### 1. Debian/Ubuntu，一键部署
 
 适用于 Debian/Ubuntu，无需 Docker，脚本会自动下载最新 Release 并完成部署。
 
@@ -91,6 +95,33 @@ FlatNas 后端集成了智能网络环境识别功能，能够根据用户的访
 wget -O deploy_debian.sh https://raw.githubusercontent.com/Garry-QD/FlatNas/main/deploy_debian.sh
 chmod +x deploy_debian.sh
 sudo ./deploy_debian.sh
+```
+
+#### Debian/Ubuntu 管理面板（管理脚本）
+
+部署完成后，使用管理脚本进行常用运维操作（查看状态、修改端口、配置 HTTPS、查看日志、卸载）。
+
+```bash
+wget -O manage.sh https://raw.githubusercontent.com/Garry-QD/FlatNas/main/manage.sh
+chmod +x manage.sh
+sudo ./manage.sh
+```
+
+菜单功能说明：
+
+- 查看服务状态：查看前后端端口、HTTPS 状态与服务运行情况
+- 修改端口配置：修改前端端口与后端端口并自动重启服务
+- 配置 HTTPS：写入证书并更新 Nginx 配置
+- 查看实时日志：跟随服务日志
+- 重启所有服务：重启 Nginx 与 FlatNas 服务
+- 卸载服务：彻底卸载 FlatNas、配置与日志
+
+#### Debian/Ubuntu 卸载（命令行）
+
+如果需要卸载，也可以直接运行管理脚本并选择“卸载服务”。
+
+```bash
+sudo ./manage.sh
 ```
 
 ### 2. 本地安装（Release 包）

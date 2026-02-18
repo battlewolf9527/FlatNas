@@ -337,7 +337,7 @@ export const useMainStore = defineStore("main", () => {
   };
 
   // Version Check
-  const currentVersion = "1.1.2dev1";
+  const currentVersion = "1.1.2dev2";
   const latestVersion = ref("");
   const dockerUpdateAvailable = ref(false);
   const updateCheckLastAt = useStorage<number>("flat-nas-update-check-last-at", 0);
@@ -1084,7 +1084,7 @@ export const useMainStore = defineStore("main", () => {
     }
 
     const doSave = async () => {
-      let shouldSyncAfterConflict = false;
+      const shouldSyncAfterConflict = false;
       if (isPageUnloading.value) {
         return;
       }

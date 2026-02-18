@@ -1302,15 +1302,6 @@ const addDivCardWidget = () => {
   
   store.saveData();
 };
-const getDivCardTargetGroupId = () => {
-  const groups = displayGroups.value;
-  if (groups.length === 0) return "";
-  if (isWebPaginationMode.value) {
-    const active = groups.find((g) => g.id === activePaginationGroupId.value);
-    return active?.id ?? groups[0]?.id ?? "";
-  }
-  return groups[0]?.id ?? "";
-};
 const handleDivCardClick = (widget: WidgetConfig) => {
   if (isEditMode.value) {
     // Edit mode: Disable click to avoid conflict with drag

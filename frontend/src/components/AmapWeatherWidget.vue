@@ -122,6 +122,39 @@ const configForm = ref({
   apiKey: "",
 });
 
+type CachedAmapWeather = {
+  forecast: Forecast | null;
+  live: LiveWeather | null;
+  timestamp: number;
+};
+
+const getCacheKey = (city: string) => `flatnas_amap_cache_${city}`;
+
+const loadCachedWeather = (city: string) => {
+  try {
+    const cached = localStorage.getItem(getCacheKey(city));
+    if (!cached) return null;
+    return JSON.parse(cached) as CachedAmapWeather;
+  } catch {
+    return null;
+  }
+};
+
+const saveCachedWeather = (city: string, forecast: Forecast | null, live: LiveWeather | null) => {
+  try {
+    localStorage.setItem(
+      getCacheKey(city),
+      JSON.stringify({
+        forecast,
+        live,
+        timestamp: Date.now(),
+      }),
+    );
+  } catch {
+    return;
+  }
+};
+
 // Weather Type Determination
 const weatherType = computed(() => {
   const w = liveWeather.value?.weather || weatherData.value?.casts[0]?.dayweather || "";
@@ -215,6 +248,8 @@ const fetchWeather = async () => {
 
     const forecastData = await forecastRes.json();
     const liveData = await liveRes.json();
+    const cached = city ? loadCachedWeather(city) : null;
+    let hasUpdate = false;
 
     if (
       forecastData.status === "1" &&
@@ -222,16 +257,38 @@ const fetchWeather = async () => {
       forecastData.forecasts.length > 0
     ) {
       weatherData.value = forecastData.forecasts[0];
+      hasUpdate = true;
     } else {
-      errorMsg.value = forecastData.info || "获取天气预报失败";
+      if (cached?.forecast) {
+        weatherData.value = cached.forecast;
+      } else {
+        errorMsg.value = forecastData.info || "获取天气预报失败";
+      }
     }
 
     if (liveData.status === "1" && liveData.lives && liveData.lives.length > 0) {
       liveWeather.value = liveData.lives[0];
+      hasUpdate = true;
+    } else if (cached?.live) {
+      liveWeather.value = cached.live;
+    }
+    if (hasUpdate && city) {
+      saveCachedWeather(city, weatherData.value, liveWeather.value);
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    errorMsg.value = e.message || "网络请求失败";
+    if (city) {
+      const cached = loadCachedWeather(city);
+      if (cached?.forecast || cached?.live) {
+        if (cached.forecast) weatherData.value = cached.forecast;
+        if (cached.live) liveWeather.value = cached.live;
+        errorMsg.value = "";
+      } else {
+        errorMsg.value = e.message || "网络请求失败";
+      }
+    } else {
+      errorMsg.value = e.message || "网络请求失败";
+    }
   } finally {
     loading.value = false;
   }

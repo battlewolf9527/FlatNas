@@ -224,38 +224,17 @@ const fetchWeather = async (force = false) => {
       }
     }
 
-    // 检查天气缓存 (缓存 1 小时)
-    const cachedWeather = localStorage.getItem(`flatnas_weather_${city}`);
-    if (cachedWeather && !force) {
-      try {
-        const data = JSON.parse(cachedWeather);
-        if (isCacheValid(data.timestamp, 60 * 60 * 1000)) {
-          weather.value = data.weather;
-          return;
-        }
-      } catch {
-        localStorage.removeItem(`flatnas_weather_${city}`);
-      }
-    }
-
-    // 调用后端天气接口或自定义接口
+    // 调用后端天气接口
     let url = `/api/weather?city=${encodeURIComponent(city)}`;
-    if (store.appConfig.weatherApiUrl) {
-      url = store.appConfig.weatherApiUrl;
-      if (url.includes("{city}")) {
-        url = url.replace("{city}", encodeURIComponent(city));
-      }
-    } else {
-      const source = store.appConfig.weatherSource || "uapi";
-      const key = store.appConfig.amapKey || "";
-      const projectId = store.appConfig.qweatherProjectId || "";
-      const keyId = store.appConfig.qweatherKeyId || "";
-      const privateKey = store.appConfig.qweatherPrivateKey || "";
+    const source = store.appConfig.weatherSource || "uapi";
+    const key = store.appConfig.amapKey || "";
+    const projectId = store.appConfig.qweatherProjectId || "";
+    const keyId = store.appConfig.qweatherKeyId || "";
+    const privateKey = store.appConfig.qweatherPrivateKey || "";
 
-      url += `&source=${source}&key=${encodeURIComponent(key)}`;
-      if (source === "qweather") {
-        url += `&projectId=${encodeURIComponent(projectId)}&keyId=${encodeURIComponent(keyId)}&privateKey=${encodeURIComponent(privateKey)}`;
-      }
+    url += `&source=${source}&key=${encodeURIComponent(key)}`;
+    if (source === "qweather") {
+      url += `&projectId=${encodeURIComponent(projectId)}&keyId=${encodeURIComponent(keyId)}&privateKey=${encodeURIComponent(privateKey)}`;
     }
 
     const weatherRes = await fetch(url);
@@ -271,14 +250,6 @@ const fetchWeather = async (force = false) => {
         today: weatherData.data.today,
       };
 
-      // 保存天气缓存
-      localStorage.setItem(
-        `flatnas_weather_${city}`,
-        JSON.stringify({
-          weather: weather.value,
-          timestamp: Date.now(),
-        }),
-      );
     } else {
       throw new Error("Weather data invalid");
     }

@@ -158,7 +158,7 @@ func main() {
 		api.GET("/get-icon-base64", handlers.GetIconBase64)
 
 		// Amap Proxy Routes
-		api.GET("/amap/weather", handlers.ProxyAmapWeather)
+		api.GET("/amap/weather", handlers.GetAmapWeather)
 		api.GET("/amap/ip", handlers.ProxyAmapIP)
 
 		api.GET("/ping", handlers.Ping)                   // Added Ping

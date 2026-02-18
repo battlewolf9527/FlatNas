@@ -9,9 +9,10 @@ import (
 	"strings"
 	"time"
 
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	socketio "github.com/googollee/go-socket.io"
-	"sync"
 )
 
 // WeatherPayload defines the structure for socket events
@@ -25,12 +26,12 @@ type WeatherPayload struct {
 }
 
 type WeatherData struct {
-	Temp     string        `json:"temp"`
-	City     string        `json:"city"`
-	Text     string        `json:"text"`
-	Humidity string        `json:"humidity"`
-	Today    WeatherRange  `json:"today"`
-	Forecast []WeatherDay  `json:"forecast"`
+	Temp     string       `json:"temp"`
+	City     string       `json:"city"`
+	Text     string       `json:"text"`
+	Humidity string       `json:"humidity"`
+	Today    WeatherRange `json:"today"`
+	Forecast []WeatherDay `json:"forecast"`
 }
 
 type WeatherRange struct {
@@ -45,7 +46,6 @@ type WeatherDay struct {
 }
 
 // UAPIResponse struct removed
-
 
 // OpenMeteo Response Structures
 type OpenMeteoGeocodingResponse struct {
@@ -76,9 +76,20 @@ type cachedWeather struct {
 	Timestamp time.Time
 }
 
+type cachedAmapResponse struct {
+	Body        []byte
+	Timestamp   time.Time
+	StatusCode  int
+	ContentType string
+}
+
 var (
-	weatherCache = make(map[string]cachedWeather)
-	cacheMutex   sync.RWMutex
+	weatherCache     = make(map[string]cachedWeather)
+	cacheMutex       sync.RWMutex
+	amapWeatherCache = make(map[string]cachedWeather)
+	amapCacheMutex   sync.RWMutex
+	amapRawCache     = make(map[string]cachedAmapResponse)
+	amapRawMutex     sync.RWMutex
 )
 
 // AmapResponse maps the response from Amap
@@ -159,10 +170,70 @@ func GetWeather(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": data})
 }
 
-// ProxyAmapWeather proxies requests to Amap Weather API
-func ProxyAmapWeather(c *gin.Context) {
-	targetURL := "https://restapi.amap.com/v3/weather/weatherInfo"
-	proxyRequest(c, targetURL)
+func GetAmapWeather(c *gin.Context) {
+	city := c.Query("city")
+	key := c.Query("key")
+	extensions := c.Query("extensions")
+	if extensions == "" {
+		extensions = "base"
+	}
+	if city == "" || key == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"status": "0", "info": "City and Key are required"})
+		return
+	}
+
+	cacheKey := city + "|" + key + "|" + extensions
+	amapRawMutex.RLock()
+	if item, ok := amapRawCache[cacheKey]; ok {
+		if time.Since(item.Timestamp) < 2*time.Hour {
+			if item.ContentType != "" {
+				c.Header("Content-Type", item.ContentType)
+			}
+			c.Status(item.StatusCode)
+			_, _ = c.Writer.Write(item.Body)
+			amapRawMutex.RUnlock()
+			return
+		}
+	}
+	amapRawMutex.RUnlock()
+
+	targetURL := fmt.Sprintf(
+		"https://restapi.amap.com/v3/weather/weatherInfo?city=%s&key=%s&extensions=%s",
+		url.QueryEscape(city),
+		url.QueryEscape(key),
+		url.QueryEscape(extensions),
+	)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Get(targetURL)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"status": "0", "info": "Failed to connect to Amap API"})
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"status": "0", "info": "Failed to read Amap API response"})
+		return
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		amapRawMutex.Lock()
+		amapRawCache[cacheKey] = cachedAmapResponse{
+			Body:        body,
+			Timestamp:   time.Now(),
+			StatusCode:  resp.StatusCode,
+			ContentType: resp.Header.Get("Content-Type"),
+		}
+		amapRawMutex.Unlock()
+	}
+
+	if contentType := resp.Header.Get("Content-Type"); contentType != "" {
+		c.Header("Content-Type", contentType)
+	}
+	c.Status(resp.StatusCode)
+	_, _ = c.Writer.Write(body)
 }
 
 // ProxyAmapIP proxies requests to Amap IP API
@@ -210,10 +281,36 @@ func proxyRequest(c *gin.Context, targetURL string) {
 
 func fetchWeatherLogic(p WeatherPayload) (*WeatherData, error) {
 	if p.Source == "amap" && p.Key != "" && p.Key != "wttr.in" {
-		return fetchAmap(p.City, p.Key)
+		return fetchAmapWithCache(p.City, p.Key)
 	}
 	// Use OpenMeteo (replaces UAPI) with cache (18 hours)
 	return fetchUAPIWithCache(p.City)
+}
+
+func fetchAmapWithCache(city, key string) (*WeatherData, error) {
+	cacheKey := city + "|" + key
+	amapCacheMutex.RLock()
+	if item, ok := amapWeatherCache[cacheKey]; ok {
+		if time.Since(item.Timestamp) < 2*time.Hour {
+			amapCacheMutex.RUnlock()
+			return item.Data, nil
+		}
+	}
+	amapCacheMutex.RUnlock()
+
+	data, err := fetchAmap(city, key)
+	if err != nil {
+		return nil, err
+	}
+
+	amapCacheMutex.Lock()
+	amapWeatherCache[cacheKey] = cachedWeather{
+		Data:      data,
+		Timestamp: time.Now(),
+	}
+	amapCacheMutex.Unlock()
+
+	return data, nil
 }
 
 func fetchUAPIWithCache(city string) (*WeatherData, error) {
@@ -247,7 +344,7 @@ func fetchOpenMeteo(city string) (*WeatherData, error) {
 	// 1. Geocoding
 	geoURL := fmt.Sprintf("https://geocoding-api.open-meteo.com/v1/search?name=%s&count=1&language=zh&format=json", url.QueryEscape(city))
 	fmt.Printf("[Weather] Geocoding: %s\n", geoURL)
-	
+
 	client := http.Client{Timeout: 10 * time.Second}
 	respGeo, err := client.Get(geoURL)
 	if err != nil {
@@ -352,17 +449,17 @@ func getWeatherText(code int) string {
 func fetchAmap(city, key string) (*WeatherData, error) {
 	// Amap requires adcode for best results, but city name works too.
 	// We need two calls: base (live) and all (forecast)
-	
+
 	// 1. Get Live Weather
 	liveURL := fmt.Sprintf("https://restapi.amap.com/v3/weather/weatherInfo?city=%s&key=%s&extensions=base", url.QueryEscape(city), key)
 	client := http.Client{Timeout: 10 * time.Second}
-	
+
 	respLive, err := client.Get(liveURL)
 	if err != nil {
 		return nil, err
 	}
 	defer respLive.Body.Close()
-	
+
 	bodyLive, _ := io.ReadAll(respLive.Body)
 	var amapLive AmapResponse
 	json.Unmarshal(bodyLive, &amapLive)
@@ -374,14 +471,14 @@ func fetchAmap(city, key string) (*WeatherData, error) {
 		return nil, err
 	}
 	defer respForecast.Body.Close()
-	
+
 	bodyForecast, _ := io.ReadAll(respForecast.Body)
 	var amapForecast AmapResponse
 	json.Unmarshal(bodyForecast, &amapForecast)
 
 	// Combine data
 	data := &WeatherData{
-		City: city,
+		City:     city,
 		Forecast: make([]WeatherDay, 0),
 	}
 
@@ -400,7 +497,7 @@ func fetchAmap(city, key string) (*WeatherData, error) {
 			Min: today.NightTemp,
 			Max: today.DayTemp,
 		}
-		
+
 		for _, cast := range casts {
 			data.Forecast = append(data.Forecast, WeatherDay{
 				Date:     cast.Date,

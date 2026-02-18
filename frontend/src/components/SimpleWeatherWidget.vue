@@ -195,6 +195,19 @@ const formatDate = (dateStr: string) => {
 
 // 获取天气
 let activeCleanup: (() => void) | undefined;
+const buildBackendWeatherUrl = (city: string) => {
+  const source = store.appConfig.weatherSource || "uapi";
+  const key = store.appConfig.amapKey || "";
+  const projectId = store.appConfig.qweatherProjectId || "";
+  const keyId = store.appConfig.qweatherKeyId || "";
+  const privateKey = store.appConfig.qweatherPrivateKey || "";
+
+  let url = `/api/weather?city=${encodeURIComponent(city)}&source=${source}&key=${encodeURIComponent(key)}`;
+  if (source === "qweather") {
+    url += `&projectId=${encodeURIComponent(projectId)}&keyId=${encodeURIComponent(keyId)}&privateKey=${encodeURIComponent(privateKey)}`;
+  }
+  return url;
+};
 const fetchWeather = async () => {
   activeCleanup?.();
   const city = props.widget?.data?.city || customCityInput.value || "Shanghai"; // Default fallback
@@ -211,19 +224,8 @@ const fetchWeather = async () => {
     if (payload.city === city) {
       // 降低日志级别，避免在控制台刷屏错误，因为我们有后续的 REST API 降级策略
       // console.warn("[Weather] Socket fetch failed, switching to REST API fallback.", payload.error);
-      const source = store.appConfig.weatherSource || "uapi";
-      const key = store.appConfig.amapKey || "";
-      const projectId = store.appConfig.qweatherProjectId || "";
-      const keyId = store.appConfig.qweatherKeyId || "";
-      const privateKey = store.appConfig.qweatherPrivateKey || "";
-
-      let url = `/api/weather?city=${encodeURIComponent(city)}&source=${source}&key=${encodeURIComponent(key)}`;
-      if (source === "qweather") {
-        url += `&projectId=${encodeURIComponent(projectId)}&keyId=${encodeURIComponent(keyId)}&privateKey=${encodeURIComponent(privateKey)}`;
-      }
-
       try {
-        const res = await fetch(url);
+        const res = await fetch(buildBackendWeatherUrl(city));
         if (!res.ok) throw new Error("REST weather failed");
         const j = await res.json();
         if (!j.success || !j.data) throw new Error("REST payload invalid");

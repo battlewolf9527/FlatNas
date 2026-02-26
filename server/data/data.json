@@ -134,7 +134,7 @@
     "weatherSource": "uapi",
     "webGroupPagination": false,
     "webGroupPaginationDisableFlip": false,
-    "widgetAreaCols": 4.5,
+    "widgetAreaCols": 4,
     "widgetAreaRows": 2,
     "widgetAreaSize": 4
   },
@@ -533,9 +533,55 @@
   ],
   "password": "$2a$10$C4z7K0wHjX3HO6C.wI.bHeflmY3lzeslZk3M2Nq0sLcIerousgMRS",
   "rssCategories": [],
-  "rssFeeds": [],
+  "rssFeeds": [
+    {
+      "category": "",
+      "enable": true,
+      "id": "1772125273610",
+      "isPublic": true,
+      "tags": [],
+      "title": "Readhub（每日早报）",
+      "url": "https://readhub.cn/daily/rss"
+    },
+    {
+      "category": "",
+      "enable": true,
+      "id": "1772125979074",
+      "isPublic": true,
+      "tags": [],
+      "title": "少数派 (sspai)",
+      "url": "https://sspai.com/feed"
+    },
+    {
+      "category": "",
+      "enable": true,
+      "id": "1772125258451",
+      "isPublic": true,
+      "tags": [],
+      "title": "IT 之家（最新）",
+      "url": "https://www.ithome.com/rss/"
+    },
+    {
+      "category": "",
+      "enable": true,
+      "id": "1772125267766",
+      "isPublic": true,
+      "tags": [],
+      "title": "钛媒体（首页）",
+      "url": "https://www.tmtpost.com/rss.xml"
+    },
+    {
+      "category": "",
+      "enable": true,
+      "id": "1772125988632",
+      "isPublic": true,
+      "tags": [],
+      "title": "36氪 (36Kr)",
+      "url": "https://www.36kr.com/feed"
+    }
+  ],
   "username": "",
-  "version": 189,
+  "version": 249,
   "widgets": [
     {
       "colSpan": 1,
@@ -689,7 +735,7 @@
       "data": {
         "content": "优化了容器卡片的显示布局\n图标匹配添加了网络搜索\n优化了倒计时的逻辑\n添加了暗夜模式\n优化了容器部分无法添加卡片的问题\n调整了版本号的位置\n测试哥哥\n测试一下看看有没有版本冲突\n",
         "mode": "simple",
-        "updatedAt": 1771405962608
+        "updatedAt": 1772132986025
       },
       "enable": true,
       "h": 2,
@@ -798,7 +844,7 @@
     },
     {
       "colSpan": 2,
-      "enable": false,
+      "enable": true,
       "id": "rss-reader",
       "isPublic": false,
       "rowSpan": 2,
@@ -933,54 +979,6 @@
       "w": 0.5,
       "x": 4,
       "y": 1
-    },
-    {
-      "colSpan": 1,
-      "data": {
-        "apiKey": "",
-        "city": "110101"
-      },
-      "enable": true,
-      "h": 2,
-      "id": "amap-weather-1771402745290",
-      "isPublic": true,
-      "layouts": {
-        "desktop": {
-          "h": 2,
-          "w": 1,
-          "x": 0,
-          "y": 2
-        }
-      },
-      "rowSpan": 2,
-      "type": "amap-weather",
-      "w": 1,
-      "x": 0,
-      "y": 2
-    },
-    {
-      "colSpan": 0.5,
-      "data": {
-        "iconSize": 180,
-        "title": "div 卡片"
-      },
-      "enable": true,
-      "h": 1,
-      "id": "div-card-1771402753456-12xq5g",
-      "isPublic": true,
-      "layouts": {
-        "desktop": {
-          "h": 1,
-          "w": 0.5,
-          "x": 0,
-          "y": 4
-        }
-      },
-      "rowSpan": 1,
-      "type": "div-card",
-      "w": 0.5,
-      "x": 0,
-      "y": 4
     },
     {
       "colSpan": 1,

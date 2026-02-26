@@ -121,7 +121,8 @@ const fetchFeed = async (feed: RssFeed) => {
   const onError = (payload: any) => {
     if (payload.url === feed.url) {
       console.error(`Failed to load RSS: ${feed.title}`, payload.error);
-      errorMsg.value = "加载失败";
+      const detail = typeof payload.error === "string" && payload.error.trim() ? payload.error.trim() : "";
+      errorMsg.value = detail ? `加载失败：${detail}` : "加载失败";
       list.value = [];
       loading.value = false;
       

@@ -116,6 +116,44 @@ const musicVolumePercent = computed({
     musicVolume.value = Math.min(1, Math.max(0, v / 100));
   },
 });
+const cardBorderHoverPreview = computed(() =>
+  store.appConfig.cardBorderColor && store.appConfig.cardBorderColor !== "transparent"
+    ? store.appConfig.cardBorderColor
+    : store.appConfig.background || store.appConfig.solidBackgroundColor
+      ? "rgba(255, 255, 255, 0.35)"
+      : "rgba(15, 23, 42, 0.12)",
+);
+const styleVariableRows = computed(() => [
+  {
+    name: "--group-title-color",
+    desc: "分组标题文字颜色",
+    value: store.appConfig.groupTitleColor || "#ffffff",
+  },
+  {
+    name: "--card-bg-color",
+    desc: "卡片背景颜色",
+    value: store.appConfig.cardBgColor || "transparent",
+  },
+  {
+    name: "--card-border-color",
+    desc: "卡片边框颜色",
+    value: store.appConfig.cardBorderColor || "transparent",
+  },
+  {
+    name: "--card-border-hover-color",
+    desc: "卡片边框悬停颜色",
+    value: cardBorderHoverPreview.value,
+  },
+  {
+    name: "--card-title-color",
+    desc: "卡片标题文字颜色",
+    value: store.appConfig.cardTitleColor || "#111827",
+  },
+]);
+const styleVariableStatus = {
+  contrast: "待校验",
+  visual: "未配置",
+};
 const solidBackgroundColorProxy = computed({
   get: () => store.appConfig.solidBackgroundColor || "#f3f4f6",
   set: (val: string) => {
@@ -3711,6 +3749,27 @@ watch(activeTab, (val) => {
                 <div class="text-xs text-gray-500 mt-2">
                   提示：在此处输入的 CSS 将直接应用到页面，可用于微调样式。
                 </div>
+                <div class="mt-3 rounded-xl border border-gray-100 bg-white/70">
+                  <div class="px-3 py-2 text-xs font-bold text-gray-700">样式变量表</div>
+                  <div
+                    class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] gap-y-2 gap-x-3 px-3 pb-3 text-xs"
+                  >
+                    <div class="text-[10px] font-semibold text-gray-400">变量</div>
+                    <div class="text-[10px] font-semibold text-gray-400">用途</div>
+                    <div class="text-[10px] font-semibold text-gray-400">当前值</div>
+                    <template v-for="row in styleVariableRows" :key="row.name">
+                      <div class="font-mono text-[11px] text-gray-700">{{ row.name }}</div>
+                      <div class="text-gray-500">{{ row.desc }}</div>
+                      <div class="font-mono text-[11px] text-gray-600">{{ row.value }}</div>
+                    </template>
+                  </div>
+                  <div
+                    class="flex items-center justify-between px-3 py-2 border-t border-gray-100 text-[10px] text-gray-500"
+                  >
+                    <span>对比度：{{ styleVariableStatus.contrast }}</span>
+                    <span>视觉回归：{{ styleVariableStatus.visual }}</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -4605,11 +4664,19 @@ document.querySelector('.card-item').addEventListener('click', () => {
   color: #f8fafc;
 }
 .night-settings :deep(.bg-white\/90),
+.night-settings :deep(.bg-white\/80),
 .night-settings :deep(.bg-white\/70),
 .night-settings :deep(.bg-white\/60),
 .night-settings :deep(.bg-white),
 .night-settings :deep(.bg-gray-50),
-.night-settings :deep(.bg-gray-100) {
+.night-settings :deep(.bg-gray-100),
+.night-settings :deep(.bg-white\/90):hover,
+.night-settings :deep(.bg-white\/80):hover,
+.night-settings :deep(.bg-white\/70):hover,
+.night-settings :deep(.bg-white\/60):hover,
+.night-settings :deep(.bg-white):hover,
+.night-settings :deep(.bg-gray-50):hover,
+.night-settings :deep(.bg-gray-100):hover {
   background-color: rgba(15, 23, 42, 0.55) !important;
   backdrop-filter: blur(12px);
 }

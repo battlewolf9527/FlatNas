@@ -337,7 +337,7 @@ export const useMainStore = defineStore("main", () => {
   };
 
   // Version Check
-  const currentVersion = "1.1.2dev2";
+  const currentVersion = "1.1.2";
   const latestVersion = ref("");
   const dockerUpdateAvailable = ref(false);
   const updateCheckLastAt = useStorage<number>("flat-nas-update-check-last-at", 0);

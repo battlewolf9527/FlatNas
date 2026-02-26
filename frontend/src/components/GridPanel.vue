@@ -2678,6 +2678,12 @@ onUnmounted(() => {
         '--group-title-color': store.appConfig.groupTitleColor || '#ffffff',
         '--card-bg-color': store.appConfig.cardBgColor || 'transparent',
         '--card-border-color': store.appConfig.cardBorderColor || 'transparent',
+        '--card-border-hover-color':
+          store.appConfig.cardBorderColor && store.appConfig.cardBorderColor !== 'transparent'
+            ? store.appConfig.cardBorderColor
+            : store.appConfig.background || store.appConfig.solidBackgroundColor
+              ? 'rgba(255, 255, 255, 0.35)'
+              : 'rgba(15, 23, 42, 0.12)',
         paddingLeft:
           isSidebarEnabled && !isMobile ? (sidebarCollapsed ? '100px' : '288px') : undefined,
       }"
@@ -3326,7 +3332,7 @@ onUnmounted(() => {
                 @touchmove="onCardTouchMove"
                 @touchend="onCardTouchEnd"
                 @touchcancel="onCardTouchEnd"
-                class="flex items-center justify-center cursor-pointer transition-all select-none relative group hover:z-[999]"
+                class="card-item flex items-center justify-center cursor-pointer transition-all select-none relative group hover:z-[999]"
                 :class="[
                   item.containerId && isUpdating.has(item.containerId)
                     ? 'opacity-50 pointer-events-none !cursor-not-allowed animate-pulse ring-2 ring-yellow-400'
@@ -4029,6 +4035,16 @@ onUnmounted(() => {
 }
 .flatnas-search-input::placeholder {
   color: var(--flatnas-search-placeholder-color, rgba(107, 114, 128, 1));
+}
+.card-item {
+  border-color: var(--card-border-color);
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+.card-item:hover {
+  border-color: var(--card-border-hover-color);
 }
 [contenteditable]:focus {
   background-color: rgba(255, 255, 255, 0.2);

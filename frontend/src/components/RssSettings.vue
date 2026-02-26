@@ -198,35 +198,35 @@ const addTagToForm = (tag: string) => {
     <!-- Add/Edit Form -->
     <div
       v-if="editingRss"
-      class="bg-orange-50 border border-orange-100 rounded-xl p-4 mb-6 animate-fade-in"
+      class="rss-form-panel rss-form-hover bg-orange-50 border border-orange-100 rounded-xl p-4 mb-6 animate-fade-in"
     >
-      <h5 class="text-sm font-bold text-orange-800 mb-3">
+      <h5 class="rss-form-title text-sm font-bold text-orange-800 mb-3">
         {{ rssForm.id ? "编辑订阅源" : "新增订阅源" }}
       </h5>
       <div class="space-y-3">
         <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">标题</label>
+          <label class="rss-form-label block text-xs font-bold text-gray-600 mb-1">标题</label>
           <input
             v-model="rssForm.title"
-            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
+            class="rss-form-input w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
             placeholder="例如：少数派"
           />
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">RSS 地址</label>
+          <label class="rss-form-label block text-xs font-bold text-gray-600 mb-1">RSS 地址</label>
           <input
             v-model="rssForm.url"
-            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
+            class="rss-form-input w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
             placeholder="https://..."
           />
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-gray-600 mb-1">分类</label>
+            <label class="rss-form-label block text-xs font-bold text-gray-600 mb-1">分类</label>
             <input
               v-model="rssForm.category"
               list="rss-categories"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
+              class="rss-form-input w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
               placeholder="选择或输入"
             />
             <datalist id="rss-categories">
@@ -234,19 +234,19 @@ const addTagToForm = (tag: string) => {
             </datalist>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-600 mb-1">标签</label>
+            <label class="rss-form-label block text-xs font-bold text-gray-600 mb-1">标签</label>
             <input
               v-model="rssForm.tags"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
+              class="rss-form-input w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-orange-500 outline-none"
               placeholder="逗号分隔"
             />
             <div v-if="allTags.length > 0" class="mt-2 flex flex-wrap gap-2">
-              <span class="text-[10px] text-gray-400">常用标签：</span>
+              <span class="rss-form-hint text-[10px] text-gray-400">常用标签：</span>
               <button
                 v-for="tag in allTags"
                 :key="tag"
                 @click="addTagToForm(tag)"
-                class="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-orange-100 text-gray-500 hover:text-orange-600 rounded transition-colors"
+                class="rss-form-tag text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-orange-100 text-gray-500 hover:text-orange-600 rounded transition-colors"
               >
                 {{ tag }}
               </button>
@@ -254,11 +254,15 @@ const addTagToForm = (tag: string) => {
           </div>
         </div>
         <div class="flex items-center gap-4 mt-2">
-          <label class="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer">
+          <label
+            class="rss-form-label flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer"
+          >
             <input type="checkbox" v-model="rssForm.enable" class="accent-orange-500" />
             启用
           </label>
-          <label class="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer">
+          <label
+            class="rss-form-label flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer"
+          >
             <input type="checkbox" v-model="rssForm.isPublic" class="accent-blue-500" />
             公开
           </label>

@@ -2,6 +2,7 @@ package config
 
 import (
 	"crypto/rand"
+	_ "embed"
 	"encoding/hex"
 	"encoding/json"
 	"log"
@@ -9,6 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 )
+
+//go:embed default.json
+var defaultJson []byte
 
 var (
 	BaseDir              string
@@ -127,17 +131,22 @@ func ensureDataFile() {
 		return
 	}
 
-	defaultData, err := os.ReadFile(DefaultFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			log.Printf("Default template not found: %s", DefaultFile)
+	if len(defaultJson) == 0 {
+		log.Printf("Embedded default.json is empty!")
+		// Fallback to reading from file if embed fails (shouldn't happen)
+		var err error
+		defaultJson, err = os.ReadFile(DefaultFile)
+		if err != nil {
+			if os.IsNotExist(err) {
+				log.Printf("Default template not found: %s", DefaultFile)
+				return
+			}
+			log.Printf("Failed to read default template: %v", err)
 			return
 		}
-		log.Printf("Failed to read default template: %v", err)
-		return
 	}
 
-	if err := os.WriteFile(dataFile, defaultData, 0644); err != nil {
+	if err := os.WriteFile(dataFile, defaultJson, 0644); err != nil {
 		log.Printf("Failed to initialize data file: %v", err)
 	}
 }
@@ -167,5 +176,5 @@ func loadSecretKey() {
 }
 
 func GetSecretKeyString() string {
-    return string(SecretKey)
+	return string(SecretKey)
 }

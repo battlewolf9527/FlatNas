@@ -531,11 +531,9 @@
       "title": "收藏夹"
     }
   ],
-  "password": "$2a$10$C4z7K0wHjX3HO6C.wI.bHeflmY3lzeslZk3M2Nq0sLcIerousgMRS",
   "rssCategories": [],
   "rssFeeds": [],
-  "username": "",
-  "version": 178,
+  "version": 166,
   "widgets": [
     {
       "colSpan": 1,
@@ -686,7 +684,7 @@
       "data": {
         "content": "优化了容器卡片的显示布局\n图标匹配添加了网络搜索\n优化了倒计时的逻辑\n添加了暗夜模式\n优化了容器部分无法添加卡片的问题\n调整了版本号的位置\n测试哥哥\n测试一下看看有没有版本冲突\n",
         "mode": "simple",
-        "updatedAt": 1772205947048
+        "updatedAt": 1771400829120
       },
       "enable": true,
       "h": 2,

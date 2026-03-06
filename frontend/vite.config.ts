@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   const winPublicDir = fileURLToPath(new URL("../win/server/public", import.meta.url));
   return ({
   base: "/",
-  publicDir: "../server/public",
+  publicDir: isWindows ? "../win/server/public" : "../server/public",
   build: {
     sourcemap: false,
     outDir: isWindows ? winPublicDir : "dist",
